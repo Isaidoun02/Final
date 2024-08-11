@@ -37,7 +37,6 @@ where \( G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k \) is the return from time \( t \
 \[
 \nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t | s_t) \left( G_t - b(s_t) \right) \right]
 \]
-where \( b(s_t) \) is a baseline function used to reduce the variance of the gradient estimates.
 
 \textbf{Networks Used:} 
 \begin{itemize}
@@ -51,9 +50,12 @@ where \( b(s_t) \) is a baseline function used to reduce the variance of the gra
 \end{itemize}
 
 \section*{2. DQN, DDQN, Prioritized Replay DDQN}
-\textbf{DQN Summary:} Deep Q-Network (DQN) is notable for combining Q-learning with deep neural networks to approximate the Q-value function, alongside using experience replay and a target network to stabilize training. This innovation addresses the problem of handling high-dimensional state spaces, such as those found in Atari games. DQN is appropriate for discrete action spaces with large state spaces. It manages states and actions using a neural network to approximate Q-values and utilizes experience replay for training stability. The Q-value update is defined as \( Q(s_t, a_t) \leftarrow r_t + \gamma \max_{a'} Q(s_{t+1}, a'; \theta^-) \), and the loss function is \( L(\theta) = \mathbb{E} \left[ \left( r_t + \gamma \max_{a'} Q(s_{t+1}, a'; \theta^-) - Q(s_t, a_t; \theta) \right)^2 \right] \).
-\textbf{DDQN Summary:} Double DQN introduces the key innovation of reducing Q-value overestimation bias by using separate networks for action selection and value evaluation. This advancement improves the stability and accuracy of Q-value estimation. DDQN addresses the problem of overestimation bias present in DQN. It is suitable for discrete action spaces with high variance in Q-value estimates. In DDQN, states and actions are managed by two networks: one for selecting actions and one for evaluating them. The update rule is \( Q(s_t, a_t; \theta) \leftarrow r_t + \gamma Q(s_{t+1}, \text{argmax}_{a'} Q(s_{t+1}, a'; \theta); \theta^-) \), and the loss function remains similar to DQN but uses the action selection network for computing the target.
-\textbf{Prioritized DDQN Summary:} Prioritized Experience Replay DDQN enhances DDQN by prioritizing the replay of important transitions, making learning more efficient. This innovation focuses on learning from more significant experiences to improve training efficiency. It solves the problem of inefficient learning from less informative experiences. It is suitable for complex environments where learning from significant experiences accelerates performance. States, actions, and rewards are managed through prioritized sampling of experiences, improving learning effectiveness. The priority update is based on the TD-error, and the loss function is similar to DDQN but incorporates sampling probabilities for transitions.
+\textbf{DQN Summary:} Deep Q-Network (DQN) was a fundamental innovation that combined Q-learning with deep neural networks to approximate the Q-value function for complex environments. It introduced experience replay and a target network to stabilize training and prevent the divergence of Q-values. DQN was developed to address the challenge of scaling Q-learning to high-dimensional state spaces, such as those found in Atari games. It is appropriate for discrete action spaces with large state spaces. DQN deals with states and actions by approximating the Q-values using a neural network, updating the network parameters via backpropagation using a loss function based on the Bellman equation.
+
+\textbf{DDQN Summary:} Double DQN (DDQN) addresses the overestimation bias present in DQN by decoupling the action selection and value evaluation steps, thereby improving the stability and accuracy of Q-value estimates. The fundamental innovation in DDQN was to reduce the overestimation of Q-values by using two separate networks for selecting actions and another for evaluating the Q-values. This modification makes DDQN more suitable for environments where Q-value estimates have high variance. The update rule in DDQN: For the next state, we select the action with the max q-value from the Q-Network (online) network and evaluate it against the other target (offline) network
+
+\textbf{Prioritized DDQN Summary:} Prioritized Experience Replay DDQN enhances DDQN by focusing the learning process on more important experiences (i.e., experiences with high temporal difference (TD) error). This innovation makes learning more efficient by prioritizing the replay of transitions that are more informative. It is particularly effective in environments where some experiences contribute more significantly to learning than others. Prioritized replay selects experiences based on their TD error, leading to faster convergence and better performance.
+
 \textbf{DQN Loss:}
 \[
 L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma \max_{a'} Q_{\theta^-}(s', a') - Q_\theta(s, a) \right)^2 \right]
@@ -64,12 +66,12 @@ L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma Q_{\theta^-}(s',
 \]
 \textbf{Prioritized Replay DDQN Loss:}
 \[
-L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \left( r + \gamma Q_{\theta^-}(s', \text{argmax}_{a'} Q_\theta(s', a')) - Q_\theta(s, a) \right)^2 \right]
+L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \text{(Same as DDQN Loss Error)} \right]
 \]
 \textbf{Networks Used:} 
 \begin{itemize}
-    \item \textbf{Q-Network} (Online)
-    \item \textbf{Target Q-Network} (Offline)
+    \item \textbf{Q-Network} (\(\theta\), Online)
+    \item \textbf{Target Q-Network} (\(\theta^-\), Offline)
 \end{itemize}
 \textbf{Hyperparameters:}
 \begin{itemize}
