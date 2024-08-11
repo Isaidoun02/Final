@@ -85,7 +85,7 @@ L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \
 \end{itemize}
 
 \section*{3. A2C/A3C}
-\textbf{A2C Summary:} Advantage Actor-Critic (A2C) introduces the idea of combining the actor-critic architecture with the advantage function to reduce variance in policy gradient updates. The advantage function provides a more stable learning signal, which improves the efficiency and stability of policy learning. A2C is appropriate for environments requiring stable policy optimization. It manages states and actions by using a value function (critic) to estimate the advantage, which is then used to update the policy (actor). The advantage function is \( \text{Adv}(s, a) = Q(s, a) - V(s) \).
+\textbf{A2C Summary:} Advantage Actor-Critic (A2C) introduces the idea of combining the actor-critic architecture with the advantage function to reduce variance in policy gradient updates. The advantage function provides a more stable learning signal, which improves the efficiency and stability of policy learning. A2C is appropriate for environments requiring stable policy optimization. It manages states and actions by using a value function (critic) to estimate the advantage, which is then used to update the policy (actor).
 
 \noindent \textbf{A3C Summary:} Asynchronous Advantage Actor-Critic (A3C) extends A2C by running multiple agents in parallel, each exploring different parts of the environment. The agents update a global model asynchronously, which leads to faster learning and greater robustness. A3C was developed to address the inefficiencies of single-threaded learning, making it particularly suitable for complex environments where parallel exploration can speed up the learning process. The update rule for A3C is similar to A2C but involves asynchronous updates across multiple agents.
 
@@ -223,6 +223,81 @@ L(\theta) = \mathbb{E}_{(s, \pi, z) \sim D} \left[ (z - V(s; \theta))^2 - \pi \c
     \item Regularization Term (\(\lambda\)): \(1e^{-4}\) to \(1e^{-3}\)
 \end{itemize}
 
+% Additional Notes Sections
+\section*{8. Advantage Function}
+\textbf{Summary:} The Advantage function \( A(s, a) \) estimates how much better it is to take a specific action \( a \) in state \( s \), compared to the average action in that state. It can be defined as:
+\[
+A(s, a) = Q(s, a) - V(s)
+\]
+The advantage function helps in reducing variance and is often used in Actor-Critic methods to stabilize learning.
+
+\section*{9. Stochastic Gradient Descent}
+\textbf{Summary:} SGD is a method used to minimize an error function (like loss or TD-error) \( \nabla_w Error^2 \) through backpropagation. The update rule for SGD is:
+\[
+w \leftarrow w - \alpha \nabla_w Error^2
+\]
+Where \( \alpha \) is the learning rate. The objective is to find the local minima of the error function by adjusting the weights in the direction of the steepest descent.
+\textbf{Ascent Variation:} Gradient ascent is used to maximize a function, such as an objective or reward function. Instead of minimizing the error, gradient ascent increases the return or reward by updating the weights in the direction of the steepest ascent:
+\[
+\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)
+\]
+This technique is commonly used in reinforcement learning to optimize policy parameters.
+\section*{10. Value Function Approximation}
+\textbf{Summary:} 
+
+\section*{11. Neural Networks (CNN, RNN, L1/L2 Regularization, Overfitting, Optimizers, Pooling)}
+\textbf{Summary:} 
+
+\section*{12. General Notes on Value-based, Policy-based, and Actor-Critic Methods}
+\textbf{Summary:} 
+
+\section*{13. Objective Function}
+\textbf{Summary:} The objective function \( J(\theta) \) represents the expected cumulative return. The goal is to find parameters \( \theta \) that maximize it. It is often defined as:
+\[
+J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} [R(\tau)] = \sum_{\tau} P(\tau;\theta)R(\tau)
+\]
+Where \( \tau \) represents the trajectory, which is the sequence of states and actions. The cumulative return \( R(\tau) \) is taken over all possible trajectories, and \( P(\tau;\theta) \) represents the probability of the possible trajectory under policy \( \pi_\theta \).
+
+\section*{14. Trajectories}
+\textbf{Summary:} 
+
+\section*{15. Experience Replay \& Prioritized Experience Replay}
+\textbf{Experience Replay:} This technique stores the agent's experiences in a replay buffer, allowing the agent to learn from a (uniformly) randomly sampled subset of past experiences to break correlations between consecutive samples.
+\[
+e_t = (s_t, a_t, r_{t+1}, s_{t+1})
+\]
+\textbf{Prioritized Experience Replay:} This variant assigns higher sampling probability to experiences with larger Temporal Difference (TD) errors, making learning more efficient by focusing on more informative experiences. The idea is that not all experiences are equally valuable. Some experiences (like those involving significant errors in prediction) can provide more informative updates to the agent's policy.
+
+\section*{16. REINFORCE Baseline}
+\textbf{Summary:} The baseline \( b(s_t) \) is subtracted from the return \( R(\tau) \) to reduce the variance of the gradient estimates. This makes the learning process more stable and efficient. The policy gradient with baseline is:
+\[
+\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \nabla_\theta \log \pi_\theta(a_t | s_t) (R(\tau) - b(s_t)) \right]
+\]
+
+\section*{17. Soft Update DQN (\(\tau\))}
+\textbf{Summary:} In DQN, a soft update is used to gradually update the target network parameters \( \theta^- \) using the online network parameters \( \theta \):
+\[
+\theta^- \leftarrow \tau \theta + (1 - \tau) \theta^-
+\]
+Where \( \tau \) is a small number, typically \( \tau = 0.005 \), ensuring smooth updates and preventing instability during training. This differs from a hard update, where the target network is updated directly with the online network parameters. \( \theta^- \leftarrow \theta \)
+
+\section*{18. Policy Gradient Theorem}
+\textbf{Summary:} The Policy Gradient Theorem provides a way to maximize the objective function \( J(\theta) \) by \textbf{estimating the gradient} \( \nabla_\theta J(\theta) \) as \( \hat{g} \)
+\[
+\nabla_\theta J(\theta) \approx \hat{g} = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \nabla_\theta \log \pi_\theta(a_t | s_t) R(\tau) \right]
+\]
+\textbf{Key Points:}
+\begin{itemize}
+    \item The gradient \( \nabla_\theta \log \pi_\theta(a_t | s_t) \) represents the direction of the steepest increase in the log probability of selecting action \( a_t \) at state \( s_t \).
+    \item This gradient tells us how to adjust the policy weights to increase or decrease the log probability of choosing action \( a_t \) at state \( s_t \).
+    \item The reward \( R(\tau) \) influences the update direction—high rewards increase the log probability of the (state, action) combination, while low rewards decrease it.
+\end{itemize}
+\textbf{Policy Update:}
+\[
+\theta \leftarrow \theta + \alpha \hat{g}
+\]
+\( \hat{g} \) serves as an approximation of the true policy gradient \( \nabla_\theta J(\theta) \), which is computationally expensive because of calculating the probability of each possible trajectory. \( \hat{g} \) is computed using sampled trajectories.
+
 \end{multicols}
 \end{document}
 
@@ -236,3 +311,4 @@ L(\theta) = \mathbb{E}_{(s, \pi, z) \sim D} \left[ (z - V(s; \theta))^2 - \pi \c
 % trajectories
 % experience replay & prioritized experience replay
 % REINFORCE baseline
+% soft update dqn (tau)
