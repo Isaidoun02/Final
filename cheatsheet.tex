@@ -242,8 +242,22 @@ Where \( \alpha \) is the learning rate. The objective is to find the local mini
 \theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)
 \]
 This technique is commonly used in reinforcement learning to optimize policy parameters.
+
 \section*{10. Value Function Approximation}
-\textbf{Summary:} 
+\textbf{Summary:} Value Function Approximation (VFA) is a technique used to represent value functions in environments with large state and action spaces, where tabular methods become impractical. By using function approximation, we can generalize across states or state-action pairs; \( \hat{v}(s,w) \) or \( \hat{q}(s,a,w) \), where the parameter \(w \) is updated using learning methods. This reduces memory and computational requirements.
+
+\noindent \textbf{Function Approximation Methods:}
+\begin{itemize}
+    \item \textbf{Linear Function Approximation:} The value function is represented as a linear combination (dot product) of features:
+    \[
+    \hat{v}(s, w) = w^T x(s) = \sum_{i=1}^{n} w_i \cdot x_i(s)
+    \]
+    where \(w\) is the weight vector, and \(x(s)\) is the feature vector (some property or aspect of state \( s \)).
+    \item \textbf{Common Approximators:} Linear functions, Neural Networks, Decision Trees, Nearest Neighbors, and Fourier/Wavelet Bases.
+\end{itemize}
+
+\noindent \textbf{Control with Function Approximation:} VFA can be used in both Monte Carlo and Temporal Difference (TD) methods. The function approximator helps in learning the value function incrementally, making the learning process more efficient in large state-action spaces.
+
 
 \section*{11. Neural Networks (CNN, RNN, L1/L2 Regularization, Overfitting, Optimizers, Pooling)}
 \textbf{Summary:} 
@@ -273,6 +287,7 @@ e_t = (s_t, a_t, r_{t+1}, s_{t+1})
 \[
 \nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \nabla_\theta \log \pi_\theta(a_t | s_t) (R(\tau) - b(s_t)) \right]
 \]
+Adding a baseline does not introduce any bias into the estimates of the policy gradient since it does not affect the expectation of the gradient estimates because it is usually chosen to be independent of the action taken
 
 \section*{17. Soft Update DQN (\(\tau\))}
 \textbf{Summary:} In DQN, a soft update is used to gradually update the target network parameters \( \theta^- \) using the online network parameters \( \theta \):
