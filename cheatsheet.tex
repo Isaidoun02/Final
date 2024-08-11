@@ -15,18 +15,35 @@
 \begin{multicols}{2}
 
 \section*{1. REINFORCE}
-\textbf{Summary:} REINFORCE introduces a fundamental innovation by employing Monte Carlo methods to estimate the return and update the policy based on actual returns from episodes. This approach improves policy gradient methods by providing complete episode returns for learning. The main problem solved is the need for accurate return estimation in environments with long episodes and sparse rewards. In REINFORCE, states and actions are used to compute returns, and policies are updated based on these returns. The return is computed as \( G_t = \sum_{k=t}^T \gamma^{k-t} r_k \), and the policy update is \( \theta \leftarrow \theta + \alpha \cdot \nabla_\theta \log \pi(a_t | s_t; \theta) \cdot G_t \), where \( G_t \) is the return from time \( t \).
+\textbf{Summary:} REINFORCE introduces the fundamental innovation of the policy gradient method, allowing direct optimization of policies by calculating gradients of expected rewards. This approach shifts from value-based methods, simplifying learning in environments where value function approximation is challenging. REINFORCE is well-suited for episodic tasks, particularly those with continuous or discrete action spaces. The algorithm uses a Monte Carlo approach, updating the policy after each episode based on cumulative return, with the gradient computed via the log-likelihood of actions. A baseline can be introduced to reduce variance and stabilize learning.
+
 \textbf{Objective:}
 \[
-\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t | s_t) R_t \right]
+J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ R(\tau) \right]
 \]
+
+\textbf{Policy Gradient:}
 \[
-\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)
+\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t | s_t) G_t \right]
 \]
+where \( G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k \) is the return from time \( t \).
+
+\textbf{Policy Update:}
+\[
+\theta \leftarrow \theta + \alpha \cdot \nabla_\theta J(\theta)
+\]
+
+\textbf{Variance Reduction (Optional Baseline):}
+\[
+\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t | s_t) \left( G_t - b(s_t) \right) \right]
+\]
+where \( b(s_t) \) is a baseline function used to reduce the variance of the gradient estimates.
+
 \textbf{Networks Used:} 
 \begin{itemize}
     \item \textbf{Policy Network} (Online)
 \end{itemize}
+
 \textbf{Hyperparameters:}
 \begin{itemize}
     \item Learning Rate (\(\alpha\)): \(1e^{-3}\) to \(1e^{-4}\)
@@ -70,7 +87,7 @@ L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \
 \textbf{A3C Summary:} Asynchronous Actor-Critic Agents (A3C) use multiple parallel agents to explore different parts of the environment and update a global model asynchronously. This innovation speeds up learning and enhances robustness by utilizing parallelism. A3C addresses the problem of slow and unstable learning by combining experiences from multiple agents. It is appropriate for environments where parallel computation can be leveraged. States and actions are managed by multiple agents exploring the environment, and rewards are used to update a shared global model asynchronously. The objective function is similar to A2C but includes asynchronous updates.
 \textbf{Actor Update:}
 \[
-\nabla_\theta J(\theta) = \mathbb{E}_{s_t, a_t} \left[ \nabla_\theta \log \pi_\theta(a_t | s_t) A(s_t, a_t) \right]
+\max_\theta \mathbb{E}_{s, a \sim \pi_{\theta_{\text{old}}}} \left[ \frac{\pi_\theta(a|s)}{\pi_{\theta_{\text{old}}}(a|s)} A^{\pi_{\theta_{\text{old}}}}(s, a) \right]
 \]
 \textbf{Critic Update:}
 \[
