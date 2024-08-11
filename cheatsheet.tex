@@ -11,11 +11,18 @@
 
 \begin{document}
 \maketitle
-\footnotesize
+\small
 \begin{multicols}{2}
 
 \section*{1. REINFORCE}
-\textbf{Summary:} REINFORCE introduces the fundamental innovation of the policy gradient method, allowing direct optimization of policies by calculating gradients of expected rewards. This approach shifts from value-based methods, simplifying learning in environments where value function approximation is challenging. REINFORCE is well-suited for episodic tasks, particularly those with continuous or discrete action spaces. The algorithm uses a Monte Carlo approach, updating the policy after each episode based on cumulative return, with the gradient computed via the log-likelihood of actions. A baseline can be introduced to reduce variance and stabilize learning.
+\textbf{Summary:}
+\begin{itemize}
+    \item Innovation: policy gradient method. Allows direct optimization of policies by calculating gradients of expected rewards
+    \item Shift from value-based methods, simplifying learning in environments where VFA is challenging
+    \item Good for episodic tasks; continuous or discrete action spaces.
+    \item Uses Monte Carlo approach; update policy after each episode completes based on cumulative return/objective function. (Calculate gradient based on log likelihood of actions)
+    \item A baseline can be introduced to reduce variance and stabilize learning
+\end{itemize}
 
 \noindent \textbf{Objective:}
 \[
@@ -49,24 +56,41 @@ where \( G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k \) is the return from time \( t \
     \item Discount Factor (\(\gamma\)): 0.99
 \end{itemize}
 
-\section*{2. DQN, DDQN, Prioritized Replay DDQN}
-\textbf{DQN Summary:} Deep Q-Network (DQN) was a fundamental innovation that combined Q-learning with deep neural networks to approximate the Q-value function for complex environments. It introduced experience replay and a target network to stabilize training and prevent the divergence of Q-values. DQN was developed to address the challenge of scaling Q-learning to high-dimensional state spaces, such as those found in Atari games. It is appropriate for discrete action spaces with large state spaces. DQN deals with states and actions by approximating the Q-values using a neural network, updating the network parameters via backpropagation using a loss function based on the Bellman equation.
+\section*{2. DQN, DDQN, + Prioritized}
+\textbf{DQN Summary:}
+\begin{itemize}
+    \item Combined Q-learning with deep neural networks to approximate the Q-value function for complex environments; scaling Q-learning to high-dimensional state spaces like Atari games
+    \item Introduced experience replay and a target network to stabilize training and prevent the divergence of Q-values
+    \item Appropriate for discrete action spaces with large state spaces
+    \item Approximates Q-values using a neural network, updating the network parameters via backpropagation using a loss function based on the Bellman equation
+\end{itemize}
 
-\noindent \textbf{DDQN Summary:} Double DQN (DDQN) addresses the overestimation bias present in DQN by decoupling the action selection and value evaluation steps, thereby improving the stability and accuracy of Q-value estimates. The fundamental innovation in DDQN was to reduce the overestimation of Q-values by using two separate networks for selecting actions and another for evaluating the Q-values. This modification makes DDQN more suitable for environments where Q-value estimates have high variance. The update rule in DDQN: For the next state, we select the action with the max q-value from the Q-Network (online) network and evaluate it against the other target (offline) network.
+\noindent \textbf{DDQN Summary:}
+\begin{itemize}
+    \item Fixes overestimation bias in DQN by decoupling the action selection and value evaluation steps. Improves stability and accuracy of Q-value estimates
+    \begin{itemize}
+        \item Innovation: Using two separate networks for selecting actions and another for evaluating Q-values
+        \item More suitable for environments where Q-value estimates have high variance
+    \end{itemize}
+\end{itemize}
 
-\noindent \textbf{Prioritized DDQN Summary:} Prioritized Experience Replay DDQN enhances DDQN by focusing the learning process on more important experiences (i.e., experiences with high temporal difference (TD) error). This innovation makes learning more efficient by prioritizing the replay of transitions that are more informative. It is particularly effective in environments where some experiences contribute more significantly to learning than others. Prioritized replay selects experiences based on their TD error, leading to faster convergence and better performance.
+% \noindent \textbf{Prioritized Replay:} Prioritized Experience Replay DDQN enhances DDQN by focusing the learning process on more important experiences (i.e., experiences with high temporal difference (TD) error). This innovation makes learning more efficient by prioritizing the replay of transitions that are more informative. It is particularly effective in environments where some experiences contribute more significantly to learning than others. Prioritized replay selects experiences based on their TD error, leading to faster convergence and better performance.
 
 \noindent \textbf{DQN Loss:}
 \[
 L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma \max_{a'} Q_{\theta^-}(s', a') - Q_\theta(s, a) \right)^2 \right]
 \]
-\textbf{DDQN Loss:}
+"For the next state, we select the action with the max q-value from the target (offline) network, and evaluate it against the same target (offline) network"
+
+\noindent \textbf{DDQN Loss:}
 \[
 L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma Q_{\theta^-}(s', \text{argmax}_{a'} Q_\theta(s', a')) - Q_\theta(s, a) \right)^2 \right]
 \]
-\textbf{Prioritized Replay DDQN Loss:}
+"For the next state, we select the action with the max q-value from the Q-Network (online) network and evaluate it against the other target (offline) network"
+
+\noindent \textbf{Prioritized Loss:}
 \[
-L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \text{(Same as DDQN Loss Error)} \right]
+L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \text{(Same as DQN/DDQN Loss Error)} \right]
 \]
 \textbf{Networks Used:} 
 \begin{itemize}
@@ -85,16 +109,28 @@ L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \
 \end{itemize}
 
 \section*{3. A2C/A3C}
-\textbf{A2C Summary:} Advantage Actor-Critic (A2C) introduces the idea of combining the actor-critic architecture with the advantage function to reduce variance in policy gradient updates. The advantage function provides a more stable learning signal, which improves the efficiency and stability of policy learning. A2C is appropriate for environments requiring stable policy optimization. It manages states and actions by using a value function (critic) to estimate the advantage, which is then used to update the policy (actor).
+\textbf{A2C Summary:}
+\begin{itemize}
+    \item Innovation: Combine actor-critic architecture with advantage function to reduce variance in policy gradient updates
+    \begin{itemize}
+        \item Provides more stable learning signal; improves the efficiency and stability of policy learning
+    \end{itemize}
+    \item Appropriate for environments requiring stable policy optimization
+    \item Uses value function (critic) to estimate the advantage, which is then used to update the policy (actor)
+\end{itemize}
 
-\noindent \textbf{A3C Summary:} Asynchronous Advantage Actor-Critic (A3C) extends A2C by running multiple agents in parallel, each exploring different parts of the environment. The agents update a global model asynchronously, which leads to faster learning and greater robustness. A3C was developed to address the inefficiencies of single-threaded learning, making it particularly suitable for complex environments where parallel exploration can speed up the learning process. The update rule for A3C is similar to A2C but involves asynchronous updates across multiple agents.
+\noindent \textbf{Asynchronous Advantage Actor-Critic (A3C) Summary:}
+\begin{itemize}
+    \item Extends A2C: runs multiple agents in parallel, each exploring different parts of the environment
+    \item Improvement: Inefficiencies of single-threaded A2C, so good for complex environments where parallel exploration speeds up the learning process. Agents update a global model asynchronously
+\end{itemize}
 
 \noindent \textbf{Actor Objective:}
 \[
 \nabla_\theta J(\theta) = \mathbb{E}_{s_t, a_t} \left[ \nabla_\theta \log \pi_\theta(a_t | s_t) A(s_t, a_t) \right]
 \]
-\text{Actor is updated using stochastic gradient ascent using the objective.}
-\textbf{Critic Loss:}
+\text{Actor is updated using gradient ascent using the objective.}
+\noindent \textbf{Critic Loss:}
 \[
 L(\phi) = \mathbb{E}_{s_t} \left[ \left( R_t - V_\phi(s_t) \right)^2 \right]
 \]
@@ -116,10 +152,19 @@ L(\phi) = \mathbb{E}_{s_t} \left[ \left( R_t - V_\phi(s_t) \right)^2 \right]
     \item Number of Workers (A3C): 16 to 32
 \end{itemize}
 
-\section*{4. DPG, DDPG}
-\textbf{DPG Summary:} Deterministic Policy Gradient (DPG) introduces the innovation of using deterministic policies instead of stochastic ones, allowing the algorithm to directly optimize the expected return with respect to deterministic actions. This is particularly useful in continuous action spaces where stochastic policies may be inefficient. DPG is suitable for problems involving continuous action spaces. It deals with states, actions, and rewards by optimizing a deterministic policy, using the deterministic policy gradient to update the policy.
+\section*{4. DPG, DDPG (Actor-Critic Methods)}
+\textbf{DPG Summary:}
+\begin{itemize}
+    \item Innovation: Use deterministic policies instead of stochastic ones; allows algorithm to directly optimize the expected return with respect to deterministic actions
+    \item Useful in continuous action spaces where stochastic policies may be inefficient
+    \item Operates with one deterministic policy and a critic that evaluates the actions chosen by this policy.
+\end{itemize}
 
-\noindent \textbf{DDPG Summary:} Deep Deterministic Policy Gradient (DDPG) extends DPG by incorporating deep neural networks for function approximation, experience replay, and target networks. This allows DDPG to scale to high-dimensional state and action spaces, making it well-suited for tasks like robotic control. DDPG handles states, actions, and rewards by using an actor-critic architecture, where the actor outputs deterministic actions, and the critic evaluates them using the Q-function.
+\noindent \textbf{DDPG Summary:}
+\begin{itemize}
+    \item Extends DPG: Uses deep neural networks for function approximation, experience replay, and target networks
+    \item Scales to high-dimensional state and action spaces
+\end{itemize}
 
 \noindent \textbf{DPG/DDPG Actor Update:}
 \[
@@ -148,9 +193,24 @@ L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma Q_{\theta^-}(s',
 \end{itemize}
 
 \section*{5. TRPO, PPO}
-\textbf{TRPO Summary:} Trust Region Policy Optimization (TRPO) innovates by introducing a constraint on the policy update to ensure it stays within a trust region, thereby preventing large, destabilizing updates. This approach addresses the problem of maintaining stability in policy learning while still making meaningful progress. TRPO is suitable for complex environments where policy stability is critical. It handles states, actions, and rewards through a constrained optimization process, ensuring that updates do not deviate too far from the previous policy.
+\textbf{TRPO (Trust Region Policy Optimization) Summary:}
+\begin{itemize}
+    \item Innovation: Hard constraint on the policy update to ensure it stays within a trust region; prevents large, destabilizing updates
+    \item Adresses maintaining stability in policy learning while still making meaningful progress
+    \item Good for complex environments where policy stability is critical
+    \item Ensures updates do not deviate too far from the previous policy
+\end{itemize}
 
-\noindent \textbf{PPO Summary:} Proximal Policy Optimization (PPO) simplifies TRPO’s trust region approach by using a clipped objective function instead of a hard constraint, which makes the algorithm easier to implement and tune. PPO solves the problem of maintaining stability in policy updates with a more practical and scalable approach. It is appropriate for both discrete and continuous action spaces. PPO deals with states, actions, and rewards by balancing exploration and exploitation through a clipped objective function.
+\noindent \textbf{PPO (Proximal Policy Optimization) Summary:}
+\begin{itemize}
+    \item Improves TRPO's trust region approach by using a clipped objective function instead of a hard constraint
+    \begin{itemize}
+        \item Makes the algorithm easier to implement and tune; more practical and scalable
+        \item Instead of ignoring updates outside trust region, clips them to be within a certain range (max or min, not ignored)
+    \end{itemize}
+    \item Good for discrete and continuous action spaces   
+    \item Balances exploration and exploitation with the clipped objective function 
+\end{itemize}
 
 \noindent \textbf{TRPO Objective:}
 \[
@@ -179,7 +239,13 @@ r_t(\theta) = \frac{\pi_\theta(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}
 \end{itemize}
 
 \section*{6. MCTS}
-\textbf{Summary:} Monte Carlo Tree Search (MCTS) innovates by combining tree search methods with Monte Carlo simulations to explore future states and make decisions based on empirical outcomes. This method addresses decision-making in complex environments by systematically exploring and evaluating potential outcomes. MCTS is suitable for games and decision-making problems with large, complex state spaces. It handles states and actions by constructing a search tree and evaluating potential actions using simulations, balancing exploration and exploitation through the Upper Confidence Bound (UCB1) formula.
+\textbf{Summary:}
+\begin{itemize}
+    \item Innovation: Combine tree search methods with Monte Carlo simulations to explore future states and make decisions based on empirical outcomes
+    \item Addresses decision-making in complex environments by systematically exploring and evaluating potential outcomes
+    \item Suitable for games and decision-making problems with complex state spaces
+    \item Constructs a search tree and follows: Selection, Expansion, Simulation, Backpropagation
+\end{itemize}
 
 \noindent \textbf{UCT (Upper Confident Trees) Formula:}
 \[
@@ -199,9 +265,16 @@ Q(s, a) = \frac{w(s, a)}{n(s, a)} + c \sqrt{\frac{\ln N(s)}{n(s, a)}}
 \end{itemize}
 
 \section*{7. AlphaGo, AlphaZero}
-\textbf{AlphaGo Summary:} AlphaGo combines Monte Carlo Tree Search (MCTS) with deep neural networks to evaluate states and select moves in the game of Go, tackling the immense complexity of the game. The innovation of using deep learning to guide and improve MCTS allowed AlphaGo to master Go, a game previously considered too complex for traditional AI approaches. It is suitable for board games with large state spaces. AlphaGo manages states and actions by using neural networks to evaluate board positions and MCTS to decide the best moves.
+\textbf{AlphaGo Summary:}
+\begin{itemize}
+    \item Innovation: Uses MCTS paired with deep neural networks to enhance MCTS
+    \item Effective for board games with very large state spaces
+\end{itemize}
 
-\noindent \textbf{AlphaZero Summary:} AlphaZero generalizes the AlphaGo approach by combining MCTS with deep learning trained entirely through self-play, making it applicable to multiple board games without any domain-specific knowledge. This innovation created a versatile system capable of mastering various games by learning from scratch. AlphaZero is appropriate for a broad range of board games and other decision-making problems. It handles states, actions, and rewards by using self-play to generate training data, which is then used to train neural networks combined with MCTS for decision-making.
+\noindent \textbf{AlphaZero Summary:}
+\begin{itemize}
+    \item Innovation: Extends AlphaGo by combining MCTS with deep neural networks trained entirely through self-play (generate its own data to train itself)
+\end{itemize}
 
 \noindent \textbf{Loss Function:}
 \[
@@ -237,14 +310,15 @@ The advantage function helps in reducing variance and is often used in Actor-Cri
 w \leftarrow w - \alpha \nabla_w Error^2
 \]
 Where \( \alpha \) is the learning rate. The objective is to find the local minima of the error function by adjusting the weights in the direction of the steepest descent.
-\textbf{Ascent Variation:} Gradient ascent is used to maximize a function, such as an objective or reward function. Instead of minimizing the error, gradient ascent increases the return or reward by updating the weights in the direction of the steepest ascent:
+
+\noindent \textbf{Ascent Variation:} Gradient ascent is used to maximize a function, such as an objective or reward function. Instead of minimizing the error, gradient ascent increases the return or reward by updating the weights in the direction of the steepest ascent:
 \[
 \theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)
 \]
 This technique is commonly used in reinforcement learning to optimize policy parameters.
 
-\section*{10. Value Function Approximation}
-\textbf{Summary:} Value Function Approximation (VFA) is a technique used to represent value functions in environments with large state and action spaces, where tabular methods become impractical. By using function approximation, we can generalize across states or state-action pairs; \( \hat{v}(s,w) \) or \( \hat{q}(s,a,w) \), where the parameter \(w \) is updated using learning methods. This reduces memory and computational requirements.
+\section*{10. Value Function Approximation (VFA)}
+\textbf{Summary:} VFA is a technique used to represent value functions in environments with large state and action spaces, where tabular methods become impractical. By using function approximation, we can generalize across states or state-action pairs; \( \hat{v}(s,w) \) or \( \hat{q}(s,a,w) \), where the parameter \(w \) is updated using learning methods. This reduces memory and computational requirements.
 
 \noindent \textbf{Function Approximation Methods:}
 \begin{itemize}
@@ -256,15 +330,15 @@ This technique is commonly used in reinforcement learning to optimize policy par
     \item \textbf{Common Approximators:} Linear functions, Neural Networks, Decision Trees, Nearest Neighbors, and Fourier/Wavelet Bases.
 \end{itemize}
 
-\noindent \textbf{Control with Function Approximation:} VFA can be used in both Monte Carlo and Temporal Difference (TD) methods. The function approximator helps in learning the value function incrementally, making the learning process more efficient in large state-action spaces.
+VFA can be used in both Monte Carlo and Temporal Difference (TD) methods. The function approximator helps in learning the value function incrementally, making the learning process more efficient in large state-action spaces.
 
 
-\section*{11. Neural Networks (CNN, RNN, L1/L2 Regularization, Overfitting, Pooling)}
-\textbf{Summary:} Convolutional Neural Network (CNN) are commonly used and use convolutions instead of matrix multiplications to exploit spatial structure in data. They are not fully connected like a standard neural network to save on computation.
+\section*{11. Neural Networks (CNN, RNN, Regularization, Overfitting, Pooling)}
+Convolutional Neural Network (CNN) are commonly used and use convolutions instead of matrix multiplications to exploit spatial structure in data. They are not fully connected like a standard neural network to save on computation.
 
-Recurrent Neural Networks (RNN) are designed to handle sequential data by maintaining a hidden state that captures temporal dependencies.
+\noindent Recurrent Neural Networks (RNN) are designed to handle sequential data by maintaining a hidden state that captures temporal dependencies.
 
-Regularization techniques like L1 and L2 regularization prevent overfitting by adding a penalty term to the loss function. Overfitting occurs when a model learns the training data too well, leading to poor generalization.
+\noindent Regularization techniques like L1 and L2 regularization prevent overfitting by adding a penalty term to the loss function. Overfitting occurs when a model learns the training data too well, leading to poor generalization.
 
 \noindent \textbf{Usage}
 \begin{itemize}
