@@ -1,0 +1,190 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[margin=0.4in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{multicol}
+
+\title{\vspace{-4cm}Reinforcement Learning Algorithms Cheat Sheet}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\footnotesize
+\begin{multicols}{2}
+
+\section*{1. REINFORCE}
+\textbf{Summary:} REINFORCE introduces a fundamental innovation by employing Monte Carlo methods to estimate the return and update the policy based on actual returns from episodes. This approach improves policy gradient methods by providing complete episode returns for learning. The main problem solved is the need for accurate return estimation in environments with long episodes and sparse rewards. In REINFORCE, states and actions are used to compute returns, and policies are updated based on these returns. The return is computed as \( G_t = \sum_{k=t}^T \gamma^{k-t} r_k \), and the policy update is \( \theta \leftarrow \theta + \alpha \cdot \nabla_\theta \log \pi(a_t | s_t; \theta) \cdot G_t \), where \( G_t \) is the return from time \( t \).
+\textbf{Objective:}
+\[
+\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t | s_t) R_t \right]
+\]
+\[
+\theta \leftarrow \theta + \alpha \nabla_\theta J(\theta)
+\]
+\textbf{Networks Used:} 
+\begin{itemize}
+    \item \textbf{Policy Network} (Online)
+\end{itemize}
+\textbf{Hyperparameters:}
+\begin{itemize}
+    \item Learning Rate (\(\alpha\)): \(1e^{-3}\) to \(1e^{-4}\)
+    \item Discount Factor (\(\gamma\)): 0.99
+\end{itemize}
+
+\section*{2. DQN, DDQN, Prioritized Replay DDQN}
+\textbf{DQN Summary:} Deep Q-Network (DQN) is notable for combining Q-learning with deep neural networks to approximate the Q-value function, alongside using experience replay and a target network to stabilize training. This innovation addresses the problem of handling high-dimensional state spaces, such as those found in Atari games. DQN is appropriate for discrete action spaces with large state spaces. It manages states and actions using a neural network to approximate Q-values and utilizes experience replay for training stability. The Q-value update is defined as \( Q(s_t, a_t) \leftarrow r_t + \gamma \max_{a'} Q(s_{t+1}, a'; \theta^-) \), and the loss function is \( L(\theta) = \mathbb{E} \left[ \left( r_t + \gamma \max_{a'} Q(s_{t+1}, a'; \theta^-) - Q(s_t, a_t; \theta) \right)^2 \right] \).
+\textbf{DDQN Summary:} Double DQN introduces the key innovation of reducing Q-value overestimation bias by using separate networks for action selection and value evaluation. This advancement improves the stability and accuracy of Q-value estimation. DDQN addresses the problem of overestimation bias present in DQN. It is suitable for discrete action spaces with high variance in Q-value estimates. In DDQN, states and actions are managed by two networks: one for selecting actions and one for evaluating them. The update rule is \( Q(s_t, a_t; \theta) \leftarrow r_t + \gamma Q(s_{t+1}, \text{argmax}_{a'} Q(s_{t+1}, a'; \theta); \theta^-) \), and the loss function remains similar to DQN but uses the action selection network for computing the target.
+\textbf{Prioritized DDQN Summary:} Prioritized Experience Replay DDQN enhances DDQN by prioritizing the replay of important transitions, making learning more efficient. This innovation focuses on learning from more significant experiences to improve training efficiency. It solves the problem of inefficient learning from less informative experiences. It is suitable for complex environments where learning from significant experiences accelerates performance. States, actions, and rewards are managed through prioritized sampling of experiences, improving learning effectiveness. The priority update is based on the TD-error, and the loss function is similar to DDQN but incorporates sampling probabilities for transitions.
+\textbf{DQN Loss:}
+\[
+L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma \max_{a'} Q_{\theta^-}(s', a') - Q_\theta(s, a) \right)^2 \right]
+\]
+\textbf{DDQN Loss:}
+\[
+L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma Q_{\theta^-}(s', \text{argmax}_{a'} Q_\theta(s', a')) - Q_\theta(s, a) \right)^2 \right]
+\]
+\textbf{Prioritized Replay DDQN Loss:}
+\[
+L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \left( r + \gamma Q_{\theta^-}(s', \text{argmax}_{a'} Q_\theta(s', a')) - Q_\theta(s, a) \right)^2 \right]
+\]
+\textbf{Networks Used:} 
+\begin{itemize}
+    \item \textbf{Q-Network} (Online)
+    \item \textbf{Target Q-Network} (Offline)
+\end{itemize}
+\textbf{Hyperparameters:}
+\begin{itemize}
+    \item Learning Rate (\(\alpha\)): \(1e^{-4}\) to \(1e^{-3}\)
+    \item Discount Factor (\(\gamma\)): 0.99
+    \item Batch Size: 32 to 64
+    \item Target Network Update Frequency: 1000
+    \item Replay Buffer Size: \(1e^5\) to \(1e^6\)
+    \item Priority Exponent (\(\beta\)): 0.4 to 1.0
+    \item Priority Scaling Factor (\(\epsilon\)): \(1e^{-5}\)
+\end{itemize}
+
+\section*{3. A2C/A3C}
+\textbf{A2C Summary:} Advantage Actor-Critic (A2C) innovates by using the advantage function to reduce variance in policy gradient updates and combines actor-critic methods for more stable learning. This approach addresses the need for stability and efficiency in policy learning. A2C is appropriate for environments requiring stable policy optimization. It handles states and actions with a value function (critic) to estimate advantages, which helps update the policy (actor). The advantage function is \( \text{Adv}(s, a) = Q(s, a) - V(s) \), and the policy update is \( \theta \leftarrow \theta + \alpha \cdot \nabla_\theta \log \pi(a_t | s_t; \theta) \cdot \text{Adv}(s_t, a_t) \).
+\textbf{A3C Summary:} Asynchronous Actor-Critic Agents (A3C) use multiple parallel agents to explore different parts of the environment and update a global model asynchronously. This innovation speeds up learning and enhances robustness by utilizing parallelism. A3C addresses the problem of slow and unstable learning by combining experiences from multiple agents. It is appropriate for environments where parallel computation can be leveraged. States and actions are managed by multiple agents exploring the environment, and rewards are used to update a shared global model asynchronously. The objective function is similar to A2C but includes asynchronous updates.
+\textbf{Actor Update:}
+\[
+\nabla_\theta J(\theta) = \mathbb{E}_{s_t, a_t} \left[ \nabla_\theta \log \pi_\theta(a_t | s_t) A(s_t, a_t) \right]
+\]
+\textbf{Critic Update:}
+\[
+L(\phi) = \mathbb{E}_{s_t} \left[ \left( R_t - V_\phi(s_t) \right)^2 \right]
+\]
+\textbf{Networks Used:}
+\begin{itemize}
+    \item \textbf{Actor Network} (Online)
+    \item \textbf{Critic Network} (Online)
+    \item \textbf{Multiple Workers (A3C)}
+\end{itemize}
+\textbf{Hyperparameters:}
+\begin{itemize}
+    \item Actor Learning Rate (\(\alpha\)): \(1e^{-4}\)
+    \item Critic Learning Rate (\(\beta\)): \(1e^{-3}\)
+    \item Discount Factor (\(\gamma\)): 0.99
+    \item Number of Workers (A3C): 16 to 32
+\end{itemize}
+
+\section*{4. DPG, DDPG}
+\textbf{DPG Summary:} Deterministic Policy Gradient (DPG) introduces the innovation of computing the gradient of expected rewards with respect to deterministic policy parameters, specifically for continuous action spaces. This method addresses the need for effective handling of continuous action spaces where traditional methods are not suitable. DPG is appropriate for continuous action spaces with deterministic policies. It handles states and actions by optimizing a deterministic policy and computes gradients directly. The policy gradient is \( \nabla_\theta J(\theta) = \mathbb{E}_{s \sim \rho_\pi} \left[ \nabla_\theta \pi(a|s; \theta) \cdot \nabla_a Q(s, a; \theta) \right] \).
+\textbf{DDPG Summary:} Deep Deterministic Policy Gradient (DDPG) extends DPG by using deep neural networks for approximating both the policy and value functions, incorporating experience replay and target networks. This approach addresses the challenge of scaling to high-dimensional continuous action spaces. DDPG is suitable for high-dimensional continuous action spaces like robotic control. It manages states, actions, and rewards using deep networks for approximation and employs experience replay for training stability. The Q-value update is \( Q(s_t, a_t; \theta^Q) \leftarrow r_t + \gamma Q(s_{t+1}, \mu(s_{t+1}; \theta^\mu); \theta^Q) \), and the policy update is \( \nabla_\theta^\mu J = \mathbb{E} \left[ \nabla_a Q(s, a; \theta^Q) \nabla_\theta^\mu \mu(s; \theta^\mu) \right] \).
+\textbf{DPG/DDPG Actor Update:}
+\[
+\nabla_\phi J(\phi) = \mathbb{E}_s \left[ \nabla_a Q_\theta(s, a) \big|_{a=\mu_\phi(s)} \nabla_\phi \mu_\phi(s) \right]
+\]
+\textbf{DDPG Critic Loss:}
+\[
+L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma Q_{\theta^-}(s', \mu_{\phi^-}(s')) - Q_\theta(s, a) \right)^2 \right]
+\]
+\textbf{Networks Used:}
+\begin{itemize}
+    \item \textbf{Actor Network} (Online)
+    \item \textbf{Critic Network} (Online)
+    \item \textbf{Target Actor Network} (Offline)
+    \item \textbf{Target Critic Network} (Offline)
+\end{itemize}
+\textbf{Hyperparameters:}
+\begin{itemize}
+    \item Actor Learning Rate (\(\alpha\)): \(1e^{-4}\) to \(1e^{-3}\)
+    \item Critic Learning Rate (\(\beta\)): \(1e^{-3}\)
+    \item Discount Factor (\(\gamma\)): 0.99
+    \item Replay Buffer Size: \(1e^5\) to \(1e^6\)
+    \item Batch Size: 100
+    \item Soft Update Rate (\(\tau\)): 0.005
+    \item Target Policy Noise: 0.2
+\end{itemize}
+
+\section*{5. TRPO, PPO}
+\textbf{TRPO Summary:} Trust Region Policy Optimization (TRPO) innovates by optimizing policies within a trust region to prevent large, destabilizing policy updates. This method solves the problem of maintaining policy stability during updates. TRPO is appropriate for complex environments where policy stability is crucial. It handles states and actions through constrained optimization, ensuring that policy changes remain within a trust region. The objective is to maximize \( \mathbb{E}_{s_t} \left[ \text{Adv}(s_t, a_t) \right] \), subject to a constraint on the Kullback-Leibler (KL) divergence: \( \mathbb{E}_{s_t} \left[ \text{KL}(\pi_{\text{old}}(a|s) \| \pi(a|s)) \right] \leq \delta \).
+\textbf{PPO Summary:} Proximal Policy Optimization (PPO) simplifies TRPO’s trust region optimization by using a clipped surrogate objective function to ensure stable policy updates. This innovation provides a practical and scalable approach to policy optimization. PPO solves the problem of maintaining stability in policy updates with a more straightforward implementation. It is suitable for both discrete and continuous action spaces. PPO manages states, actions, and rewards through a clipped objective function, balancing exploration and exploitation. The objective is to maximize \( \mathbb{E} \left[ \min \left( r_t(\theta) \cdot \text{Adv}(s_t, a_t), \text{clip}(r_t(\theta), 1 - \epsilon, 1 + \epsilon) \cdot \text{Adv}(s_t, a_t) \right) \right] \), where \( r_t(\theta) = \frac{\pi(a_t | s_t; \theta)}{\pi(a_t | s_t; \theta_{\text{old}})} \).
+\textbf{TRPO Objective:}
+\[
+\max_\theta \mathbb{E}_{s, a \sim \pi_{\theta_{\text{old}}}} \left[ \frac{\pi_\theta(a|s)}{\pi_{\theta_{\text{old}}}(a|s)} A^{\pi_{\theta_{\text{old}}}}(s, a) \right]
+\]
+\textbf{PPO Objective:}
+\[
+\max_\theta \mathbb{E}_{s, a \sim \pi_{\theta_{\text{old}}}} \left[ \min\left( r_t(\theta) A_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) A_t \right) \right]
+\]
+\[
+r_t(\theta) = \frac{\pi_\theta(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}
+\]
+\textbf{Networks Used:}
+\begin{itemize}
+    \item \textbf{Policy Network} (Online)
+    \item \textbf{Value Network} (Online)
+\end{itemize}
+\textbf{Hyperparameters:}
+\begin{itemize}
+    \item Learning Rate (\(\alpha\)): \(1e^{-4}\) to \(3e^{-4}\)
+    \item Discount Factor (\(\gamma\)): 0.99
+    \item KL Divergence Constraint (\(\delta\)): 0.01 to 0.02
+    \item Clip Range (\(\epsilon\)): 0.1 to 0.2
+    \item Number of Epochs: 3 to 10
+    \item Batch Size: 64 to 2048
+\end{itemize}
+
+\section*{6. MCTS}
+\textbf{Summary:} Monte Carlo Tree Search (MCTS) innovates by utilizing simulations to explore potential future states and build a search tree based on empirical outcomes. This method addresses decision-making in complex environments by exploring and evaluating future possibilities. MCTS is appropriate for games and decision-making problems with large state spaces. It manages states and actions through a search tree and evaluates possible outcomes using simulations. The objective involves balancing exploration and exploitation with the Upper Confidence Bound (UCB1) formula: \( \text{UCB1} = \bar{X}_j + C \sqrt{\frac{\ln N_i}{n_j}} \).
+\textbf{UCT Formula:}
+\[
+Q(s, a) = \frac{w(s, a)}{n(s, a)} + c \sqrt{\frac{\ln N(s)}{n(s, a)}}
+\]
+\textbf{Networks Used:}
+\begin{itemize}
+    \item \textbf{Search Tree} (Online)
+\end{itemize}
+\textbf{Hyperparameters:}
+\begin{itemize}
+    \item Exploration Constant (\(c\)): Empirical
+    \item Number of Simulations: 1000 to 10000
+    \item Tree Depth: Problem-specific
+\end{itemize}
+
+\section*{7. AlphaGo, AlphaZero}
+\textbf{AlphaGo Summary:} AlphaGo combines MCTS with deep neural networks for state evaluation and move selection, enabling it to tackle the complex game of Go. This innovation leverages deep learning to guide and improve MCTS. AlphaGo solves the problem of mastering Go, a game with immense complexity and strategic depth. It is appropriate for board games with large state spaces. States and actions are evaluated using neural networks, and MCTS is used for decision-making. The policy network outputs move probabilities, and the value network estimates winning chances from a given board state.
+\textbf{AlphaZero Summary:} AlphaZero generalizes the AlphaGo approach by combining MCTS with deep learning trained through self-play, making it applicable to multiple board games. This innovation creates a versatile system capable of mastering various games without domain-specific knowledge. AlphaZero addresses the need for a universal learning system that can generalize across different games. It is suitable for board games and other decision-making problems. AlphaZero uses self-play to generate training data and combines it with neural networks and MCTS for decision-making. The objective involves optimizing both policy and value networks through self-play and MCTS.
+\textbf{Loss Function:}
+\[
+L(\theta) = \mathbb{E}_{(s, \pi, z) \sim D} \left[ (z - V(s; \theta))^2 - \pi \cdot \log \pi(a|s; \theta) + \lambda \|\theta\|^2 \right]
+\]
+\textbf{Networks Used:}
+\begin{itemize}
+    \item \textbf{Policy Network} (Online)
+    \item \textbf{Value Network} (Online)
+\end{itemize}
+\textbf{Hyperparameters:}
+\begin{itemize}
+    \item Learning Rate (\(\alpha\)): \(1e^{-3}\) to \(1e^{-2}\)
+    \item Discount Factor (\(\gamma\)): 1.0
+    \item MCTS Simulations: Several thousand
+    \item Temperature: Annealed over time
+    \item Regularization Term (\(\lambda\)): \(1e^{-4}\) to \(1e^{-3}\)
+\end{itemize}
+
+\end{multicols}
+\end{document}
