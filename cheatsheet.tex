@@ -259,44 +259,49 @@ This technique is commonly used in reinforcement learning to optimize policy par
 \noindent \textbf{Control with Function Approximation:} VFA can be used in both Monte Carlo and Temporal Difference (TD) methods. The function approximator helps in learning the value function incrementally, making the learning process more efficient in large state-action spaces.
 
 
-\section*{11. Neural Networks (CNN, RNN, L1/L2 Regularization, Overfitting, Optimizers, Pooling)}
-\textbf{Summary:} 
+\section*{11. Neural Networks (CNN, RNN, L1/L2 Regularization, Overfitting, Pooling)}
+\textbf{Summary:} Convolutional Neural Network (CNN) are commonly used and use convolutions instead of matrix multiplications to exploit spatial structure in data. They are not fully connected like a standard neural network to save on computation.
 
-\section*{12. General Notes on Value-based, Policy-based, and Actor-Critic Methods}
-\textbf{Summary:} 
+Recurrent Neural Networks (RNN) are designed to handle sequential data by maintaining a hidden state that captures temporal dependencies.
 
-\section*{13. Objective Function}
+Regularization techniques like L1 and L2 regularization prevent overfitting by adding a penalty term to the loss function. Overfitting occurs when a model learns the training data too well, leading to poor generalization.
+
+\noindent \textbf{Usage}
+\begin{itemize}
+    \item L1: Add \( \lambda |w| \) to each weight error function (encourages all weights to zero)
+    \item L2 (Weight Decay): Augment the error function with \( \frac{1}{2} \lambda w^2 \) encourages small weights/to use all inputs instead of relying on strongest signal
+\end{itemize}
+Pooling is used in CNNs to reduce the spatial dimensions of the input and improve invariance, for example we combine/pool nearby neurons to reduce the size of the representation, like taking the max or average of a group of neurons.
+
+\section*{12. Objective Function}
 \textbf{Summary:} The objective function \( J(\theta) \) represents the expected cumulative return. The goal is to find parameters \( \theta \) that maximize it. It is often defined as:
 \[
 J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} [R(\tau)] = \sum_{\tau} P(\tau;\theta)R(\tau)
 \]
 Where \( \tau \) represents the trajectory, which is the sequence of states and actions. The cumulative return \( R(\tau) \) is taken over all possible trajectories, and \( P(\tau;\theta) \) represents the probability of the possible trajectory under policy \( \pi_\theta \).
 
-\section*{14. Trajectories}
-\textbf{Summary:} 
-
-\section*{15. Experience Replay \& Prioritized Experience Replay}
+\section*{13. Experience Replay \& Prioritized Experience Replay}
 \textbf{Experience Replay:} This technique stores the agent's experiences in a replay buffer, allowing the agent to learn from a (uniformly) randomly sampled subset of past experiences to break correlations between consecutive samples.
 \[
 e_t = (s_t, a_t, r_{t+1}, s_{t+1})
 \]
 \textbf{Prioritized Experience Replay:} This variant assigns higher sampling probability to experiences with larger Temporal Difference (TD) errors, making learning more efficient by focusing on more informative experiences. The idea is that not all experiences are equally valuable. Some experiences (like those involving significant errors in prediction) can provide more informative updates to the agent's policy.
 
-\section*{16. REINFORCE Baseline}
+\section*{14. REINFORCE Baseline}
 \textbf{Summary:} The baseline \( b(s_t) \) is subtracted from the return \( R(\tau) \) to reduce the variance of the gradient estimates. This makes the learning process more stable and efficient. The policy gradient with baseline is:
 \[
 \nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \nabla_\theta \log \pi_\theta(a_t | s_t) (R(\tau) - b(s_t)) \right]
 \]
 Adding a baseline does not introduce any bias into the estimates of the policy gradient since it does not affect the expectation of the gradient estimates because it is usually chosen to be independent of the action taken
 
-\section*{17. Soft Update DQN (\(\tau\))}
+\section*{15. Soft Update DQN (\(\tau\))}
 \textbf{Summary:} In DQN, a soft update is used to gradually update the target network parameters \( \theta^- \) using the online network parameters \( \theta \):
 \[
 \theta^- \leftarrow \tau \theta + (1 - \tau) \theta^-
 \]
 Where \( \tau \) is a small number, typically \( \tau = 0.005 \), ensuring smooth updates and preventing instability during training. This differs from a hard update, where the target network is updated directly with the online network parameters. \( \theta^- \leftarrow \theta \)
 
-\section*{18. Policy Gradient Theorem}
+\section*{16. Policy Gradient Theorem}
 \textbf{Summary:} The Policy Gradient Theorem provides a way to maximize the objective function \( J(\theta) \) by \textbf{estimating the gradient} \( \nabla_\theta J(\theta) \) as \( \hat{g} \)
 \[
 \nabla_\theta J(\theta) \approx \hat{g} = \mathbb{E}_{\tau \sim \pi_\theta} \left[ \nabla_\theta \log \pi_\theta(a_t | s_t) R(\tau) \right]
@@ -312,6 +317,12 @@ Where \( \tau \) is a small number, typically \( \tau = 0.005 \), ensuring smoot
 \theta \leftarrow \theta + \alpha \hat{g}
 \]
 \( \hat{g} \) serves as an approximation of the true policy gradient \( \nabla_\theta J(\theta) \), which is computationally expensive because of calculating the probability of each possible trajectory. \( \hat{g} \) is computed using sampled trajectories.
+
+\section*{17. Importance Sampling}
+A technique used to estimate the properties of a particular distribution, while only having samples generated from a different distribution than the one of interest. This approach can greatly improve the efficiency of Monte Carlo simulations by reducing variance, especially when dealing with high-dimensional data.
+
+\section*{18. Bootstrapping}
+Bootstrapping methods mean that it updates the value estimates based on other estimated values, rather than waiting for the final outcome (trajectory) of the episode.
 
 \end{multicols}
 \end{document}
