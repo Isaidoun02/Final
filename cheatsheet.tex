@@ -14,7 +14,7 @@
 \normalsize
 \begin{multicols}{2}
 
-\section*{1. REINFORCE}
+\section*{1. REINFORCE (On-Policy)}
 \textbf{Summary:}
 \begin{itemize}
     \item Innovation: policy gradient method. Allows direct optimization of policies by calculating gradients of expected rewards
@@ -52,7 +52,7 @@ where \( G_t = \sum_{k=t}^{T} \gamma^{k-t} r_k \) is the return from time \( t \
 
 \noindent \textbf{Hyperparameters: }Learning Rate (\(\alpha\)), Discount Factor (\(\gamma\))
 
-\section*{2. DQN, DDQN, + Prioritized}
+\section*{2. DQN, DDQN, + Prioritized (Off-Policy)}
 \textbf{DQN Summary:}
 \begin{itemize}
     \item Combined Q-learning with deep neural networks to approximate the Q-value function for complex environments; scaling Q-learning to high-dimensional state spaces like Atari games
@@ -96,7 +96,7 @@ L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \frac{p_i}{\text{Priority\_Sum}} \
 \textbf{Hyperparameters: }Learning Rate (\(\alpha\)), Discount Factor (\(\gamma\)), Batch Size, Target Network Update Frequency, Replay Buffer Size, Priority Exponent (\(\beta\)), Priority Scaling Factor (\(\epsilon\))
 
 
-\section*{3. A2C/A3C}
+\section*{3. A2C/A3C (On-Policy)}
 \textbf{A2C Summary:}
 \begin{itemize}
     \item Innovation: Combine actor-critic architecture with advantage function to reduce variance in policy gradient updates
@@ -134,7 +134,7 @@ L(\phi) = \mathbb{E}_{s_t} \left[ \left( R_t - V_\phi(s_t) \right)^2 \right]
 \end{itemize}
 \textbf{Hyperparameters: }Actor Learning Rate (\(\alpha\)), Critic Learning Rate (\(\beta\)), Discount Factor (\(\gamma\)), Number of Workers (A3C)
 
-\section*{4. DPG, DDPG (Actor-Critic Methods)}
+\section*{4. DPG, DDPG (Off-Policy Actor-Critic Methods)}
 \textbf{DPG Summary:}
 \begin{itemize}
     \item Innovation: Use deterministic policies instead of stochastic ones; allows algorithm to directly optimize the expected return with respect to deterministic actions
@@ -166,7 +166,7 @@ L(\theta) = \mathbb{E}_{(s, a, r, s')} \left[ \left( r + \gamma Q_{\theta^-}(s',
 \textbf{Hyperparameters: }Actor Learning Rate (\(\alpha\)), Critic Learning Rate (\(\beta\)), Discount Factor (\(\gamma\)), Replay Buffer Size, Batch Size, Soft Update Rate (\(\tau\)), Target Policy Noise
 
 
-\section*{5. TRPO, PPO}
+\section*{5. TRPO, PPO (On-Policy)}
 \textbf{TRPO (Trust Region Policy Optimization) Summary:}
 \begin{itemize}
     \item Innovation: Hard constraint on the policy update to ensure it stays within a trust region; prevents large, destabilizing updates
@@ -204,7 +204,7 @@ r_t(\theta) = \frac{\pi_\theta(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}
 \end{itemize}
 \textbf{Hyperparameters: }Learning Rate (\(\alpha\)), Discount Factor (\(\gamma\)), KL Divergence Constraint (\(\delta\)) (TRPO only), Clip Range (\(\epsilon\)) (PPO only), Number of Epochs, Batch Size
 
-\section*{6. MCTS}
+\section*{6. MCTS (Off-Policy)}
 \textbf{Summary:}
 \begin{itemize}
     \item Innovation: Combine tree search methods with Monte Carlo simulations to explore future states and make decisions based on empirical outcomes
@@ -226,7 +226,7 @@ Q(s, a) = \frac{w(s, a)}{n(s, a)} + c \sqrt{\frac{\ln N(s)}{n(s, a)}}
 \noindent \textbf{Hyperparameters: }Exploration Constant (\(c\)): Empirical, Number of Simulations, Tree Depth: Problem-specific
 
 
-\section*{7. AlphaGo, AlphaZero}
+\section*{7. AlphaGo, AlphaZero (Off-Policy)}
 \textbf{AlphaGo Summary:}
 \begin{itemize}
     \item Innovation: Uses MCTS paired with deep neural networks to enhance MCTS
@@ -352,6 +352,40 @@ A technique used to estimate the properties of a particular distribution, while 
 
 \section*{18. Bootstrapping}
 Bootstrapping methods mean that it updates the value estimates based on other estimated values, rather than waiting for the final outcome (trajectory) of the episode.
+
+\section*{19. Bellman Equation}
+\[
+v_\pi(s) = \sum_{a \in A} \pi(a | s) \left[ \sum_{s' \in S} p(s' | s, a) [r + \gamma v_\pi(s')]\right]
+\]
+Probability we take specific action \( a \) in state \( s \) (policy) for all actions.
+Probability of we actually end up in state \( s' \) if we take action \( a \) in state \( s \) (deterministic or not).
+
+\section*{20. Policy Improvement Theorem}
+We can always greedify to obtain a better policy \(\pi'\), where "better" is \(q_{\pi'}(s,a) \geq q_\pi(s,a)\) for all \(s,a\). Basically keep greedifying until \(\pi\) is the same as \(\pi'\):
+\[
+\pi'(s) = \arg \max_a q_\pi(s, a)
+\]
+
+\section*{21. Eligibility Traces}
+\textbf{Summary:} Eligibility traces are a mechanism used to bridge the gap between Monte Carlo methods (which use complete returns) and Temporal Difference (TD) methods (which use one-step returns). They allow for a mix between these two extremes, enabling more efficient learning by considering a broader range of rewards over multiple steps.
+
+\begin{itemize}
+    \item In Monte Carlo, every state-action pair that occurs in an episode is updated based on the complete return.
+    \begin{itemize}
+        \item Every state gets \( \frac{r}{t} \) reward (equal) for each time step \( t \) in the episode. Equivalent to TD(\( \lambda=1 \))
+    \end{itemize}
+    \item In TD(\( \lambda=0 \)), when terminal state reached, only the immediate state-action pair that led to the terminal state is updated with the reward.
+    \item In TD(\( \lambda=0.9 \)), the immediate state-action pair that led to the terminal state gets the full reward, but previous state-action pairs get decayed reward (scaled by \( \lambda \)).
+    \item Also has a threshold for the minimum eligibility trace value, below which the trace (and reward) is set to zero.
+\end{itemize}
+
+\section*{22. N-Step Prediction}
+\textbf{Summary:} Used in TD learning methods, to update the value of a state by looking ahead multiple steps in the future.
+
+\begin{itemize}
+    \item 1-step equivalent to TD(0), need to only look ahead one step to update the value of a state.
+    \item \( \infty \)-step is equivalent to Monte Carlo, need to look ahead to the end of the episode to update the value of a state.
+\end{itemize}
 
 \end{multicols}
 \end{document}
