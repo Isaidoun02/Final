@@ -457,8 +457,16 @@ Q(S, A) \leftarrow Q(S, A) + \alpha \left[ R +
     \end{itemize}
 \end{itemize}
 
+\section*{27. Optimism Bias}
+\textbf{Summary:} A systematic overestimation of the value of an action that occurs in Q-learning and other algorithms based on it like DQN. Happens because the state-action value estimates are updated using a greedy policy both for selecting the action to take, and for evaluating it's benefit in future states. Double Q-Learning decouples these two greedy selections by using two seperate value functions.
 
+\section*{28. Other}
+If policy gradient methods are off-policy, just like Q-learning,then why are they better able to find stable solutions quickly?
 
+\begin{itemize}
+    \item Off-policy \textbf{*value based*} methods like Q-learning, only focus on evaluating the policy locally, and hoping that this will allow the agent to choose the best action
+    \item PG methods improve a policy directly towards an estimate of the optimal direction.
+\end{itemize}
 
 \end{multicols}
 \end{document}
