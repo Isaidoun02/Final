@@ -15,7 +15,7 @@
 \begin{multicols}{2}
 
 \section*{1. REINFORCE (On-Policy)}
-\textbf{Summary:}
+\textbf{Summary:} (aka. Vanilla Policy Gradient)
 \begin{itemize}
     \item Innovation: policy gradient method. Allows direct optimization of policies by calculating gradients of expected rewards
     \item Shift from value-based methods, simplifying learning in environments where VFA is challenging
@@ -407,11 +407,12 @@ We can always greedify to obtain a better policy \(\pi'\), where "better" is \(q
 
 \section*{24. Expected SARSA: On-Policy TD Control}
 \[
-Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + 
-\gamma \mathbb{E}[Q(S_{t+1}, A_{t+1}) \mid S_{t+1}] - Q(S_t, A_t) \right]
+Q(S, A) \leftarrow Q(S, A) + \alpha \left[ R + 
+\gamma \sum_a \pi(a \mid S') Q(S', a) - Q(S, A) \right]
 \]
 \begin{itemize}
     \item \( \pi(a|s) = 0.9\) for max \(a\), \(\frac{0.1}{|A|-1}\) for others
+    \item SARSA \& Q-Learning, vulnerable to sample bias; where rewards are sparse or highly variable causes few observed rewards to not accurately represent the overall reward distribution
 \end{itemize}
 
 \section*{25. Q-Learning: Off-Policy TD Control}
