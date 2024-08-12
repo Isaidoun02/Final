@@ -387,5 +387,77 @@ We can always greedify to obtain a better policy \(\pi'\), where "better" is \(q
     \item \( \infty \)-step is equivalent to Monte Carlo, need to look ahead to the end of the episode to update the value of a state.
 \end{itemize}
 
+\section*{23. SARSA: On-Policy TD Control}
+\begin{itemize}
+    \item Initialize \( Q(s,a) \) for all \( s \in S \), \( a \in A(s) \) arbitrarily, and \( Q(\text{terminal-state}, \cdot) = 0 \)
+    \item Repeat (for each episode):
+    \begin{itemize}
+        \item Initialize \( S \)
+        \item Choose \( A \) from \( S \) using policy derived from \( Q \) (e.g., \(\epsilon\)-greedy)
+        \item Repeat (for each step of episode):
+        \begin{itemize}
+            \item Take action \( A \), observe \( R, S' \)
+            \item Choose \( A' \) from \( S' \) using policy derived from \( Q \) (e.g., \(\epsilon\)-greedy)
+            \item \( Q(S,A) \leftarrow Q(S,A) + \alpha [R + \gamma Q(S', A') - Q(S,A)] \)
+            \item \( S \leftarrow S' \); \( A \leftarrow A' \)
+        \end{itemize}
+        \item until \( S \) is terminal
+    \end{itemize}
+\end{itemize}
+
+\section*{24. Expected SARSA: On-Policy TD Control}
+\[
+Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + 
+\gamma \mathbb{E}[Q(S_{t+1}, A_{t+1}) \mid S_{t+1}] - Q(S_t, A_t) \right]
+\]
+\begin{itemize}
+    \item \( \pi(a|s) = 0.9\) for max \(a\), \(\frac{0.1}{|A|-1}\) for others
+\end{itemize}
+
+\section*{25. Q-Learning: Off-Policy TD Control}
+\begin{itemize}
+    \item Initialize \( Q(s,a) \) for all \( s \in S \), \( a \in A(s) \) arbitrarily, and \( Q(\text{terminal-state}, \cdot) = 0 \)
+    \item Repeat (for each episode):
+    \begin{itemize}
+        \item Initialize \( S \)
+        \item Repeat (for each step of episode):
+        \begin{itemize}
+            \item Choose \( A \) from \( S \) using policy derived from \( Q \) (e.g., \(\epsilon\)-greedy)
+            \item Take action \( A \), observe \( R, S' \)
+            \item \( Q(S,A) \leftarrow Q(S,A) + \alpha [R + \gamma \max_{a} Q(S', a) - Q(S,A)] \)
+            \item \( S \leftarrow S' \)
+        \end{itemize}
+        \item until \( S \) is terminal
+    \end{itemize}
+\end{itemize}
+
+\section*{26. Double Q-Learning}
+\begin{itemize}
+    \item Initialize \( Q_1(s,a) \) and \( Q_2(s,a) \) for all \( s \in S \), \( a \in A(s) \) arbitrarily
+    \item Initialize \( Q_1(\text{terminal-state}, \cdot) = Q_2(\text{terminal-state}, \cdot) = 0 \)
+    \item Repeat (for each episode):
+    \begin{itemize}
+        \item Initialize \( S \)
+        \item Repeat (for each step of episode):
+        \begin{itemize}
+            \item Choose \( A \) from \( S \) using policy derived from \( Q_1 \) and \( Q_2 \) (e.g., \(\epsilon\)-greedy in \( Q_1 + Q_2 \))
+            \item Take action \( A \), observe \( R, S' \)
+            \item With 0.5 probability:
+            \begin{itemize}
+                \item \( Q_1(S,A) \leftarrow Q_1(S,A) + \alpha [R + \gamma Q_2(S', \arg \max_{a} Q_1(S',a)) - Q_1(S,A)] \)
+            \end{itemize}
+            \item else:
+            \begin{itemize}
+                \item \( Q_2(S,A) \leftarrow Q_2(S,A) + \alpha [R + \gamma Q_1(S', \arg \max_{a} Q_2(S',a)) - Q_2(S,A)] \)
+            \end{itemize}
+            \item \( S \leftarrow S' \)
+        \end{itemize}
+        \item until \( S \) is terminal
+    \end{itemize}
+\end{itemize}
+
+
+
+
 \end{multicols}
 \end{document}
